@@ -15,8 +15,8 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->string('description');
-            $table->string('start_date');
-            $table->string('end_date');
+            $table->dateTime('start_date');
+            $table->dateTime('end_date');
             $table->string('status');
             $table->string('region');
             $table->foreignId('venue_id')->nullable();

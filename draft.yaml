@@ -2,8 +2,8 @@ models:
   Conference:
     name: string
     description: string
-    start_date: string
-    end_date: string
+    start_date: dateTime
+    end_date: dateTime
     status: string
     region: string
     venue_id: unsignedInteger nullable
