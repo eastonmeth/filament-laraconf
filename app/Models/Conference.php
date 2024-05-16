@@ -15,6 +15,7 @@ class Conference extends Model
         'id' => 'integer',
         'start_date' => 'datetime',
         'end_date' => 'datetime',
+        'region' => Region::class,
         'venue_id' => 'integer',
     ];
 
