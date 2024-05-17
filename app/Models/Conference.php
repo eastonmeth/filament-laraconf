@@ -3,6 +3,8 @@
 namespace App\Models;
 
 use App\Enums\Region;
+use Filament\Forms\Components\Actions;
+use Filament\Forms\Components\Actions\Action;
 use Filament\Forms\Components\CheckboxList;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Fieldset;
@@ -108,6 +110,23 @@ class Conference extends Model
                                 ->options(Speaker::all()->pluck('name', 'id')),
                         ]),
                 ]),
+            Actions::make([
+                Action::make('star')
+                    ->label('Fill with Factory Data')
+                    ->icon('heroicon-m-star')
+                    ->visible(function (string $operation): bool {
+                        if (! app()->environment('local') || $operation !== 'create') {
+                            return false;
+                        }
+
+                        return true;
+                    })
+                    ->action(function (object $livewire): void {
+                        $data = Conference::factory()->make()->toArray();
+                        $livewire->form->fill($data);
+                    }),
+            ]),
+
             // Section::make('Conference Details')
             //     ->description('Provide some basic information about the conference.')
             //     ->icon('heroicon-o-information-circle')
