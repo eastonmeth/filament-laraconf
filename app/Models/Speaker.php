@@ -9,15 +9,32 @@ use Filament\Forms\Components\TextInput;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Speaker extends Model
 {
     use HasFactory;
 
+    public const QUALIFICATIONS = [
+        'expert-on-topic' => 'Topic Expert',
+        'well-known-speaker' => 'Renowned Speaker',
+        'relevant-background' => 'Relevant Background',
+        'published-research' => 'Published Researcher',
+        'industry-experience' => 'Industry Veteran',
+        'diverse-perspective' => 'Diverse Perspective',
+        'recommendation' => 'Recommended Speaker',
+        'speaking-experience' => 'Experienced Speaker',
+    ];
+
     protected $casts = [
         'id' => 'integer',
         'qualifications' => 'array',
     ];
+
+    public function talks(): HasMany
+    {
+        return $this->hasMany(Talk::class);
+    }
 
     public function conferences(): BelongsToMany
     {
@@ -47,16 +64,7 @@ class Speaker extends Model
                 ->columnSpanFull()
                 ->searchable()
                 ->bulkToggleable()
-                ->options([
-                    'expert-on-topic' => 'Topic Expert',
-                    'well-known-speaker' => 'Renowned Speaker',
-                    'relevant-background' => 'Relevant Background',
-                    'published-research' => 'Published Researcher',
-                    'industry-experience' => 'Industry Veteran',
-                    'diverse-perspective' => 'Diverse Perspective',
-                    'recommendation' => 'Recommended Speaker',
-                    'speaking-experience' => 'Experienced Speaker',
-                ])
+                ->options(self::QUALIFICATIONS)
                 ->descriptions([
                     'expert-on-topic' => 'Expert on the topic being presented',
                     'well-known-speaker' => 'Well-known professional speaker',
