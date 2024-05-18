@@ -5,14 +5,17 @@ namespace App\Filament\Resources;
 use App\Enums\TalkLength;
 use App\Enums\TalkStatus;
 use App\Filament\Resources\TalkResource\Pages;
+use App\Filament\Resources\TalkResource\Pages\ListTalks;
 use App\Models\Talk;
 use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Actions\Action;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Str;
 
 class TalkResource extends Resource
@@ -94,12 +97,60 @@ class TalkResource extends Resource
                     }),
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
+                Tables\Actions\EditAction::make()
+                    ->slideOver(),
+                Tables\Actions\ActionGroup::make([
+                    Tables\Actions\Action::make('approve')
+                        ->visible(function (Talk $record): bool {
+                            return $record->status !== TalkStatus::APPROVED;
+                        })
+                        ->requiresConfirmation()
+                        ->icon('heroicon-o-check-circle')
+                        ->color('success')
+                        ->action(function (Talk $record): void {
+                            $record->approve();
+                        })->after(function (): void {
+                            Notification::make()
+                                ->success()
+                                ->title('This talk was approved.')
+                                ->body('The speaker has been notified and the talk has been added to the conference schedule.')
+                                ->send();
+                        }),
+                    Tables\Actions\Action::make('reject')
+                        ->visible(function (Talk $record): bool {
+                            return $record->status !== TalkStatus::REJECTED;
+                        })
+                        ->requiresConfirmation()
+                        ->icon('heroicon-o-no-symbol')
+                        ->color('danger')
+                        ->action(function (Talk $record): void {
+                            $record->reject();
+                        })->after(function (): void {
+                            Notification::make()
+                                ->danger()
+                                ->title('This talk was rejected.')
+                                ->body('The speaker has been notified and the talk has been rejected.')
+                                ->send();
+                        }),
+                ]),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
+                    Tables\Actions\BulkAction::make('approve')
+                        ->icon('heroicon-o-check-circle')
+                        ->color('success')
+                        ->action(function (Collection $records): void {
+                            $records->each->approve();
+                        }),
                 ]),
+            ])
+            ->headerActions([
+                Tables\Actions\Action::make('export')
+                    ->tooltip('This will export all records currently visible in the table. Your selected filters will affect what is exported.')
+                    ->action(function (ListTalks $livewire): void {
+                        dd($livewire->getFilteredTableQuery());
+                    }),
             ]);
     }
 
@@ -115,7 +166,7 @@ class TalkResource extends Resource
         return [
             'index' => Pages\ListTalks::route('/'),
             'create' => Pages\CreateTalk::route('/create'),
-            'edit' => Pages\EditTalk::route('/{record}/edit'),
+            // 'edit' => Pages\EditTalk::route('/{record}/edit'),
         ];
     }
 }
