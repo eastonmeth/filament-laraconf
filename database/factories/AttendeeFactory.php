@@ -22,6 +22,8 @@ class AttendeeFactory extends Factory
             'email' => $this->faker->safeEmail(),
             'ticket_cost' => 50000,
             'is_paid' => true,
+            'conference_id' => 1,
+            'created_at' => $this->faker->dateTimeBetween('-3 months'),
         ];
     }
 
