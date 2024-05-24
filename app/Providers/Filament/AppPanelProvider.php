@@ -43,7 +43,7 @@ class AppPanelProvider extends PanelProvider
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
             ->sidebarFullyCollapsibleOnDesktop()
             ->navigationGroups([
-                NavigationGroup::make('First Group')->icon('heroicon-o-cake'),
+                NavigationGroup::make('First Group'),
                 NavigationGroup::make('Second Group')->icon('heroicon-o-bolt'),
             ])
             ->pages([
