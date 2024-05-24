@@ -6,8 +6,10 @@ use App\Filament\Resources\AttendeeResource\Pages;
 use App\Filament\Resources\AttendeeResource\Widgets\AttendeeChartWidget;
 use App\Filament\Resources\AttendeeResource\Widgets\AttendeesStatsWidget;
 use App\Models\Attendee;
+use Awcodes\Shout\Components\Shout;
 use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Forms\Get;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -44,6 +46,18 @@ class AttendeeResource extends Resource
     {
         return $form
             ->schema([
+                Shout::make('warn-price')
+                    ->visible(function (Get $get): bool {
+                        return $get('ticket_cost') > 500;
+                    })
+                    ->columnSpanFull()
+                    ->type('warning')
+                    ->content(function (Get $get): string {
+                        $price = $get('ticket_cost');
+                        $priceAbove = $price - 500;
+
+                        return "This is \${$priceAbove} above the average ticket price!";
+                    }),
                 Forms\Components\TextInput::make('name')
                     ->required()
                     ->maxLength(255),
@@ -52,6 +66,7 @@ class AttendeeResource extends Resource
                     ->required()
                     ->maxLength(255),
                 Forms\Components\TextInput::make('ticket_cost')
+                    ->lazy()
                     ->required()
                     ->numeric(),
                 Forms\Components\Toggle::make('is_paid')
